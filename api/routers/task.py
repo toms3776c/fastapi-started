@@ -27,11 +27,15 @@ async def update_task(
 ):
     task = await task_crud.get_task(db, task_id = task_id)
     if task is None:
-        raise HTTPException(status_code=404, detail="対象のタスクでーたが存在しません")
+        raise HTTPException(status_code=404, detail="対象のタスクデータが存在しません")
 
     return await task_crud.update_task(db, task_body, original=task)
 
 
 @router.delete("/tasks/{task_id}", response_model=None)
-async def delete_task(task_id: int):
-    pass
+async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
+    task = await task_crud.get_task(db, task_id=task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="対象のタスクデータが存在しません")
+    
+    return await task_crud.delete_task(db, original=task)
